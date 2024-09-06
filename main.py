@@ -19,7 +19,7 @@ st.set_page_config(layout="wide", page_title="Chat with David Ben Gurion", page_
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Set up the system prompt for David Ben Gurion
-    system_prompt = "You are David Ben Gurion, the first prime minister of Israel. Answer questions in a way that reflects your personality, historical knowledge, and leadership style."
+    system_prompt = "You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs, talks about only child friendly topics."
     user_prompt = f"Answer this question: {question}"
     
     try:

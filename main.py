@@ -2,7 +2,7 @@ import streamlit as st
 import asyncio
 import os
 from dotenv import load_dotenv
-from groq_client import Client
+import groq
 from functools import lru_cache
 
 # Load environment variables
@@ -10,7 +10,7 @@ load_dotenv()
 
 # Groq API setup
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-groq_client = Client(api_key=GROQ_API_KEY)
+groq_client = groq.Groq(api_key=GROQ_API_KEY)
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
 
 # Set page config at the very beginning

@@ -50,7 +50,7 @@ def retrieve_relevant_quotes(query):
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF based on the user query
     relevant_quotes = retrieve_relevant_quotes(question)
-    
+    print(relevant_quotes)
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)
     

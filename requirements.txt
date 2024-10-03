@@ -4,5 +4,3 @@ groq
 python-dotenv
 asyncio
 PyMuPDF
-embedchain
-protobuf==3.20.*

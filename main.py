@@ -119,7 +119,7 @@ def retrieve_relevant_quotes_semantically(query, top_k=3):
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF using semantic search
-    relevant_quotes = retrieve_relevant_quotes_semantically(question, 1)
+    relevant_quotes = retrieve_relevant_quotes_semantically(question, 2)
 
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)
@@ -127,7 +127,7 @@ def ask_groq(question):
     # Include the retrieved quotes in the system prompt to guide the response
     system_prompt = f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics."
 
-    user_prompt = f"Use the following quotes to guide your response:\n\n{quotes_context}\n\n Answer this question in correct, valid and clear hebrew sentences: {question}"
+    user_prompt = f"If it relevant base your answer on the following quotes of you to guide your response:\n\n{quotes_context}\n\n Answer this question as you are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. in correct, valid and clear hebrew sentences: {question}"
 
     try:
         response = groq_client.chat.completions.create(

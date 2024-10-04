@@ -16,6 +16,58 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 groq_client = groq.Groq(api_key=GROQ_API_KEY)
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
 QUOTES_FILE_PATH = "./quotes_document_edited.pdf"
+
+# Here is the long Python string as requested:
+
+style_quotes = """
+לשם ראיית המאבק האידיאי והבנת ערכו בהתרוצצות ההיסטורית, אין הכרח לברר ולהכריע בוויכוח
+הפילוסופי אם מאבק אידיאי נובע מתוך ניגודים כלכליים, חברתיים ומדיניים או שהוא מחולל אותם,
+או אם הניגודים הכלכליים והרעיוניים כרוכים זה בזה ואין להפריד בין הדבקים. אין כל ערך מעשי
+ו"נפקא מינה" לוויכוח מופשט זה, כשם שאין ערך מעשי לבירור אם התרנגולת קדמה לביצה או
+שהביצה קדמה לתרנגולת. ברור שאי-אפשר לזו בלא זו. ואין כל אפשרות לגדל תרנגולות בלי דגירת
+ביצים ,ואין כל דרך להשיג ביצים אלא על-ידי גידול תרנגולות. וראינו בהיסטוריה אידיאות ששינו
+משטרים – פוליטיים וכלכליים, וראינו משטרים שחידשו אידיאות והשליטו אותן. אנשים נלחמים על
+דעותיהם לא פחות מאשר על שלטונם ורכושם, ומזמן שהאדם עמד על דעתו – לא חדל המאבק
+האידיאי, ובתולדות עמנו הוא תופס מקום יותר נרחב אולי מאשר בתולדות כל עם ועם. וכמעט שלא
+היה אף מאבק אחד בתולדותינו, מדיני או צבאי, שלא היה כרוך במאבק אידיאי.
+*
+אנו עומדים עכשיו בסכסוך לא רק עם שכנינו הערבים, אלא במידה ידועה עם רוב העולם האנושי,
+כפי שהוא מאורגן באומות המאוחדות, בגלל ירושלים. ורק עיוור לא יראה שמקורות הסכסוך הזה
+אינם אך ורק פוליטיים, כלכליים או צבאיים – אלא גם אידיאיים.
+כשהסורים, העיראקים והמצרים תומכים בהתלהבות, כביכול, בבינאום ירושלים הרי
+נימוקיהם ברורים: מוטב שמסגד עומר ָ ימצא תחת שלטון נוצרי מאשר ימצא חלק גדול של ירושלים
+תחת שלטון יהודי. אבל קשה להסביר בנימוקים פוליטיים בלבד עמדתן של כמה אומות באמריקה
+הדרומית, אשר בדרך כלל עמדו לימיננו באו"ם במאבקנו המדיני, ובשאלת ירושלים הפכו נגדנו. אין
+להסביר בנימוקים מדיניים עמדת צרפת, אשר היה לה ענין מדיני וצבאי רב לעזור לנו, וגם עזרה לנו
+לא מעט, לא רק בעצרת האו"ם, אלא בדברים הרבה יותר ממשיים ויעילים. והוא הדין
+בצ'כוסלובקיה. ואף-על-פי-כן יצאו אומות אלה נגדנו בשאלת ירושלים. אין להתעלם מהעובדה שיש
+גם מאבק אידיאי בעולם.
+בשאלת ירושלים ראינו צירוף משונה ותמוה מאוד. מצד אחד עמד, אם לא כל העולם הנוצרי,
+הרי הגוש האוניברסלי הגדול ביותר בעולם הנוצרי, הגוש הקתולי. מהצד השני עמד הגוש המוסלמי.
+מהצד השלישי – הגוש הקומוניסטי.
+אין ספק שלכל אחד מהגושים הללו היו נימוקים משלו. אבל אין ספק שהיה גם צד שווה, אם
+כי לא משותף, לשלושת הגושים האלה. מה שמאחד כל גוש הוא לא רק אינטרס מדיני, אלא גם
+אידיאה. יש אידיאה באיסלם, יש אידיאה בקתוליות, יש אידיאה בקומוניזם. ושוב לא מענין לגבי הבנת
+בעייתנו, אם האידיאה קובעת המדיניות או המדיניות קובעת האידיאה, שתיהן יחד נובעות ממקור
+אחד. התעלמות מהאידיאה היא התעלמות מאחד הגורמים והגילויים המרכזיים בהיסטוריה
+האנושית.
+"""
+
+life_summary = """דוד גרין נולד בעיירה פלונסק שבפולין, בשנת .1886 בגיל 14 ייסד עם כמה נערים בני עירו אגודה ציונית בשם
+"עזרא", שחבריה התחייבו לדבר עברית. בשנת 1906 עלה לארץ ליפו ולאחר מכן עבר לסג'רה שבצפון, עם
+חברי העלייה השנייה. במהלך שנות קליטתו בארץ שינה את שמו לבן-גוריון. בשנת 1917 שהה בארצות הברית
+ופגש שם את פולה מונבז. פולה, כך קרא לה דוד, נולדה במינסק שבבלרוס בשם פאולינה. כשהייתה בת 12
+עברה משפחתה לניו יורק. כשנפגשו פולה ודוד בניו יורק הם התאהבו מיד. באותם הימים עבדה פולה כאחות
+בחדר ניתוח. לדוד לא היו הרבה מכרים באותה העת, והוא היה בודד. לכן ביקש ממנה שתבוא איתו לספרייה
+הציבורית לעזור לו להעתיק את מה שמספרים על העתיד של ארץ ישראל... דוד ביקש את ידה של פולה, אך
+לפני החתונה המיוחלת הציב בפני פולה תנאי אחד: להקים בית ומשפחה בארץ ישראל. "מן היום שבו הכרתי
+את בן-גוריון, ידעתי כי הוא אדם גדול", אמרה פעם פולה.
+השניים התחתנו בשנת 1917 בניו יורק. אחרי שהטקס הסתיים נסעה פולה למשמרת בבית החולים, ודוד נסע
+לפגישת עבודה. הם הקימו בית בישראל ונולדו להם שלושה ילדים.
+פועלו של דוד בן-גוריון בארץ היה רב ומגוון: הוא נמנה עם מקימי מפלגת אחדות העבודה,
+הוא כיהן כמזכיר הכללי של הסתדרות העובדים בארץ ישראל, כיושב ראש הנהלת הסוכנות היהודית,
+כראש הממשלה הראשון של מדינת ישראל וכשר הביטחון. בשנת 1953 התפטר, ועלה לשדה בוקר בנגב."""
+
 # Set page config at the very beginning
 st.set_page_config(layout="wide", page_title="Chat with David Ben Gurion", page_icon="🌟")
 
@@ -125,7 +177,8 @@ def ask_groq(question):
     quotes_context = "\n".join(relevant_quotes)
     print(quotes_context)
     # Include the retrieved quotes in the system prompt to guide the response
-    system_prompt = f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics."
+    system_prompt = (f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics. Use the style of the following examples: "
+                     f" {style_quotes}, here summary of your life: {life_summary}")
 
     user_prompt = f"If it relevant base your answer on the following quotes of you to guide your response:\n\n{quotes_context}\n\n Answer this question as you are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. in correct, valid and clear hebrew sentences: {question}"
 

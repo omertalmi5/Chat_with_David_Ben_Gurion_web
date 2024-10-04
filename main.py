@@ -15,7 +15,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 groq_client = groq.Groq(api_key=GROQ_API_KEY)
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
-
+QUOTES_FILE_PATH = "./quotes_document_edited.pdf"
 # Set page config at the very beginning
 st.set_page_config(layout="wide", page_title="Chat with David Ben Gurion", page_icon="🌟")
 
@@ -61,20 +61,13 @@ def load_quotes_from_pdf(pdf_path, min_sentences=3):
     # Split the text into individual quotes or paragraphs
     quotes = text.split("\n")  # Split by newlines
 
-    # Function to count the number of sentences in a paragraph
-    def count_sentences(paragraph):
-        # A sentence is typically identified by punctuation followed by a space
-        sentences = re.split(r'[.!?]\s', paragraph)
-        return len([s for s in sentences if s.strip()])  # Count only non-empty sentences
-
-    # Filter out paragraphs with fewer than `min_sentences`
-    filtered_quotes = [quote for quote in quotes if count_sentences(quote) >= min_sentences]
+    filtered_quotes = [quote for quote in quotes if "ע\"מ" not in quote]
 
     print(f"Total quotes: {len(filtered_quotes)}")  # To see how many are filtered
     return filtered_quotes
 
 # Load quotes from the attached PDF
-QUOTES = load_quotes_from_pdf("./quotes_document.pdf", min_sentences=3)
+QUOTES = load_quotes_from_pdf(QUOTES_FILE_PATH, min_sentences=2)
 
 # Precompute embeddings for all the quotes
 @st.cache_data

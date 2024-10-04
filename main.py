@@ -18,6 +18,23 @@ GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
 # Set page config at the very beginning
 st.set_page_config(layout="wide", page_title="Chat with David Ben Gurion", page_icon="🌟")
 
+# Add RTL support via CSS
+rtl_style = """
+    <style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+    .stTextInput > div > div > input {
+        direction: rtl;
+    }
+    .stChatMessage .stMarkdown {
+        text-align: right;
+    }
+    </style>
+"""
+st.markdown(rtl_style, unsafe_allow_html=True)
+
 
 # Load the pre-trained sentence-transformers model for semantic search
 @st.cache_resource

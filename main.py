@@ -47,9 +47,9 @@ def load_model():
 model = load_model()
 
 
-# Function to extract quotes from the PDF document
+# Function to extract and chunk quotes from the PDF document
 @st.cache_data
-def load_quotes_from_pdf(pdf_path, min_sentences=3):
+def load_quotes_from_pdf(pdf_path, chunk_size=200):
     doc = fitz.open(pdf_path)
     text = ""
 
@@ -58,38 +58,56 @@ def load_quotes_from_pdf(pdf_path, min_sentences=3):
         page = doc.load_page(page_num)
         text += page.get_text("text")
 
-    # Split the text into individual quotes or paragraphs
-    quotes = text.split("\n")  # Split by newlines
+    # Remove unwanted content and split the text into sentences
+    filtered_sentences = [sentence for sentence in text.split("\n") if "ע\"מ" not in sentence and len(sentence.split()) > 3]
 
-    filtered_quotes = [quote for quote in quotes if "ע\"מ" not in quote]
+    # Chunking the text by combining sentences into manageable chunks (e.g., 200-300 words per chunk)
+    chunks = []
+    current_chunk = []
+    current_length = 0
 
-    print(f"Total quotes: {len(filtered_quotes)}")  # To see how many are filtered
-    return filtered_quotes
+    for sentence in filtered_sentences:
+        current_chunk.append(sentence)
+        current_length += len(sentence.split())
 
-# Load quotes from the attached PDF
-QUOTES = load_quotes_from_pdf(QUOTES_FILE_PATH, min_sentences=2)
+        # If the current chunk reaches the desired size, save it and start a new one
+        if current_length >= chunk_size:
+            chunks.append(" ".join(current_chunk))
+            current_chunk = []
+            current_length = 0
 
-# Precompute embeddings for all the quotes
+    # Add any remaining text as a chunk
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    print(f"Total chunks: {len(chunks)}")
+    return chunks
+
+# Load chunks from the attached PDF
+QUOTES = load_quotes_from_pdf(QUOTES_FILE_PATH)
+
+# Precompute embeddings for all the chunks
 @st.cache_data
 def compute_quote_embeddings(quotes):
     return model.encode(quotes, convert_to_tensor=True)
 
 QUOTE_EMBEDDINGS = compute_quote_embeddings(QUOTES)
 
-# Function to retrieve relevant quotes based on semantic similarity
-def retrieve_relevant_quotes_semantically(query, top_k=0.9):
+# Function to retrieve relevant chunks based on semantic similarity
+def retrieve_relevant_quotes_semantically(query, top_k=3):
     query_embedding = model.encode(query, convert_to_tensor=True)
-    # Compute cosine similarity between the query and all the quotes
+    # Compute cosine similarity between the query and all the quote embeddings
     cos_scores = util.pytorch_cos_sim(query_embedding, QUOTE_EMBEDDINGS)[0]
 
     # Convert cos_scores tensor to a list of tuples (score, index)
     scores_and_indices = [(score.item(), idx) for idx, score in enumerate(cos_scores)]
 
-    # Sort by cosine similarity score in descending order
+    # Sort by cosine similarity score in descending order and return top_k results
     top_results = sorted(scores_and_indices, key=lambda x: x[0], reverse=True)[:top_k]
 
-    # Retrieve the top k quotes based on sorted scores
+    # Retrieve the top k chunks based on sorted scores
     relevant_quotes = [QUOTES[idx] for _, idx in top_results]
+    print(len(relevant_quotes))
 
     if not relevant_quotes:
         return ["No relevant quotes found."]
@@ -97,10 +115,11 @@ def retrieve_relevant_quotes_semantically(query, top_k=0.9):
     return relevant_quotes
 
 
+
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF using semantic search
-    relevant_quotes = retrieve_relevant_quotes_semantically(question, 6)
+    relevant_quotes = retrieve_relevant_quotes_semantically(question, 1)
 
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)

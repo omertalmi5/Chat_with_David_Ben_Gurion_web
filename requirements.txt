@@ -1,6 +1,7 @@
-streamlit 
+streamlit
 streamlit-chat
 groq
 python-dotenv
 asyncio
 PyMuPDF
+sentence_transformers

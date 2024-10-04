@@ -6,6 +6,7 @@ import groq
 from functools import lru_cache
 import fitz  # PyMuPDF for PDF extraction
 from sentence_transformers import SentenceTransformer, util  # For semantic search
+import re
 
 # Load environment variables
 load_dotenv()
@@ -48,7 +49,7 @@ model = load_model()
 
 # Function to extract quotes from the PDF document
 @st.cache_data
-def load_quotes_from_pdf(pdf_path):
+def load_quotes_from_pdf(pdf_path, min_sentences=3):
     doc = fitz.open(pdf_path)
     text = ""
 
@@ -58,14 +59,22 @@ def load_quotes_from_pdf(pdf_path):
         text += page.get_text("text")
 
     # Split the text into individual quotes or paragraphs
-    quotes = text.split("\n")  # Assuming quotes are separated by double newlines
-    print(len(quotes))
-    return quotes
+    quotes = text.split("\n")  # Split by newlines
 
+    # Function to count the number of sentences in a paragraph
+    def count_sentences(paragraph):
+        # A sentence is typically identified by punctuation followed by a space
+        sentences = re.split(r'[.!?]\s', paragraph)
+        return len([s for s in sentences if s.strip()])  # Count only non-empty sentences
+
+    # Filter out paragraphs with fewer than `min_sentences`
+    filtered_quotes = [quote for quote in quotes if count_sentences(quote) >= min_sentences]
+
+    print(f"Total quotes: {len(filtered_quotes)}")  # To see how many are filtered
+    return filtered_quotes
 
 # Load quotes from the attached PDF
-QUOTES = load_quotes_from_pdf("./quotes_document.pdf")
-
+QUOTES = load_quotes_from_pdf("./quotes_document.pdf", min_sentences=3)
 
 # Precompute embeddings for all the quotes
 @st.cache_data
@@ -75,7 +84,7 @@ def compute_quote_embeddings(quotes):
 QUOTE_EMBEDDINGS = compute_quote_embeddings(QUOTES)
 
 # Function to retrieve relevant quotes based on semantic similarity
-def retrieve_relevant_quotes_semantically(query, top_k=1):
+def retrieve_relevant_quotes_semantically(query, top_k=0.9):
     query_embedding = model.encode(query, convert_to_tensor=True)
     # Compute cosine similarity between the query and all the quotes
     cos_scores = util.pytorch_cos_sim(query_embedding, QUOTE_EMBEDDINGS)[0]
@@ -98,15 +107,15 @@ def retrieve_relevant_quotes_semantically(query, top_k=1):
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF using semantic search
-    relevant_quotes = retrieve_relevant_quotes_semantically(question, 3)
+    relevant_quotes = retrieve_relevant_quotes_semantically(question, 6)
 
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)
     print(quotes_context)
     # Include the retrieved quotes in the system prompt to guide the response
-    system_prompt = f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics."
+    system_prompt = f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics."
 
-    user_prompt = f"Use the following quotes to guide your response:\n\n{quotes_context}\n\n Answer this question: {question}"
+    user_prompt = f"Use the following quotes to guide your response:\n\n{quotes_context}\n\n Answer this question in correct, valid and clear hebrew sentences: {question}"
 
     try:
         response = groq_client.chat.completions.create(

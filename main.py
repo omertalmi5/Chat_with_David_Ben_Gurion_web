@@ -55,9 +55,7 @@ QUOTES = load_quotes_from_pdf("./quotes_document.pdf")
 def compute_quote_embeddings(quotes):
     return model.encode(quotes, convert_to_tensor=True)
 
-# print(QUOTES)
 QUOTE_EMBEDDINGS = compute_quote_embeddings(QUOTES)
-
 
 # Function to retrieve relevant quotes based on semantic similarity
 def retrieve_relevant_quotes_semantically(query, top_k=1):
@@ -83,7 +81,7 @@ def retrieve_relevant_quotes_semantically(query, top_k=1):
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF using semantic search
-    relevant_quotes = retrieve_relevant_quotes_semantically(question)
+    relevant_quotes = retrieve_relevant_quotes_semantically(question, 3)
 
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)
@@ -100,7 +98,7 @@ def ask_groq(question):
                 {"role": "user", "content": user_prompt},
             ],
             model=GROQ_MODEL,
-            temperature=0.5,
+            temperature=1,
             max_tokens=1024,
             stream=False,
         )

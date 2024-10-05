@@ -207,52 +207,80 @@ def ask_groq(question):
     except Exception as e:
         st.error(f"Error: {str(e)}")
         return "סליחה אך אינני יכול לענות על שאלה זו"
+#
+# def create_chatbot():
+#     # Initialize session state if it doesn't exist
+#     if 'messages' not in st.session_state:
+#         st.session_state['messages'] = []
+#         st.session_state['first_message'] = True  # Track whether it's the first message
+#
+#     # Display previous chat messages
+#     for message in st.session_state.get('messages', []):
+#         with st.chat_message(message["role"]):
+#             st.markdown(message["content"])
+#
+#     selected_question = None
+#
+#     # If it's the first message, show the optional questions as buttons
+#     if st.session_state['first_message']:
+#         optional_questions = [
+#             "אתה מאמין באלוהים?",
+#             "למה גרת בשדה בוקר?",
+#             "למה עשית עמידות ראש?",
+#             "למה לא ביטלת את הממשל הצבאי?",
+#         ]
+#
+#         # Create four buttons in a row using columns
+#         col1, col2, col3, col4 = st.columns(4)
+#
+#         # Display buttons in each column, and check if one is clicked
+#         with col1:
+#             if st.button(optional_questions[0]):
+#                 selected_question = optional_questions[0]
+#         with col2:
+#             if st.button(optional_questions[1]):
+#                 selected_question = optional_questions[1]
+#         with col3:
+#             if st.button(optional_questions[2]):
+#                 selected_question = optional_questions[2]
+#         with col4:
+#             if st.button(optional_questions[3]):
+#                 selected_question = optional_questions[3]
+#
+#         # Always show text input for the user to ask any question
+#         prompt = st.text_input("שאל אותי כל שאלה", value=selected_question if selected_question else "")
+#     else:
+#         # Input for the user's message
+#         prompt = st.chat_input("שאל אותי כל שאלה")
+#
+#     if prompt:
+#         # Display the user input
+#         st.chat_message("user").markdown(prompt)
+#         st.session_state['messages'].append({"role": "user", "content": prompt})
+#
+#         # Generate response from David Ben Gurion using retrieved quotes
+#         with st.chat_message("assistant"):
+#             with st.spinner('אני חושב...'):
+#                 response = ask_groq(prompt)
+#             st.markdown(response)
+#         st.session_state['messages'].append({"role": "assistant", "content": response})
+#
+#         # Once the first message has been sent, mark it as processed
+#         st.session_state['first_message'] = False
+
+
 
 def create_chatbot():
-    # Initialize session state if it doesn't exist
     if 'messages' not in st.session_state:
         st.session_state['messages'] = []
-        st.session_state['first_message'] = True  # Track whether it's the first message
 
     # Display previous chat messages
     for message in st.session_state.get('messages', []):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    selected_question = None
-
-    # If it's the first message, show the optional questions as buttons
-    if st.session_state['first_message']:
-        optional_questions = [
-            "אתה מאמין באלוהים?",
-            "למה גרת בשדה בוקר?",
-            "למה עשית עמידות ראש?",
-            "למה לא ביטלת את הממשל הצבאי?",
-        ]
-
-        # Create four buttons in a row using columns
-        col1, col2, col3, col4 = st.columns(4)
-
-        # Display buttons in each column, and check if one is clicked
-        with col1:
-            if st.button(optional_questions[0]):
-                selected_question = optional_questions[0]
-        with col2:
-            if st.button(optional_questions[1]):
-                selected_question = optional_questions[1]
-        with col3:
-            if st.button(optional_questions[2]):
-                selected_question = optional_questions[2]
-        with col4:
-            if st.button(optional_questions[3]):
-                selected_question = optional_questions[3]
-
-        # After the first message is sent, set `first_message` to False
-        if selected_question:
-            st.session_state['first_message'] = False
-
-    # Input for the user's custom message or the selected question
-    prompt = st.text_input("שאל אותי כל שאלה", value=selected_question if selected_question else "")
+    # Input for the user's message
+    prompt = st.chat_input("שאל אותי כל שאלה")
 
     if prompt:
         # Display the user input
@@ -265,10 +293,6 @@ def create_chatbot():
                 response = ask_groq(prompt)
             st.markdown(response)
         st.session_state['messages'].append({"role": "assistant", "content": response})
-
-        # Once the first message has been sent, mark it as processed
-        st.session_state['first_message'] = False
-
 
 
 async def main():

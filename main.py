@@ -110,8 +110,18 @@ def load_quotes_from_pdf(pdf_path, chunk_size=200):
         page = doc.load_page(page_num)
         text += page.get_text("text")
 
-    # Remove unwanted content and split the text into sentences
-    filtered_sentences = [sentence for sentence in text.split("\n") if "ע\"מ" not in sentence and len(sentence.split()) > 3]
+    split_signs = r'[.!?\n\(\)]'
+
+    # List of unwanted strings
+    unwanted_strings = ["עמ'", "עמ׳", "חזון ודרך", "עמ׳"]  # Add more unwanted strings here
+    string_number_pattern = r'\D+\d+'
+    # Sample code with filtering conditions
+    filtered_sentences = [
+        re.sub(r'\d+', '', sentence)
+        for sentence in re.split(split_signs, text)  # Split by multiple signs including new lines and parentheses
+        if not any(unwanted in sentence for unwanted in unwanted_strings)
+           and not re.search(string_number_pattern, sentence)
+    ]
 
     # Chunking the text by combining sentences into manageable chunks (e.g., 200-300 words per chunk)
     chunks = []
@@ -198,18 +208,51 @@ def ask_groq(question):
         st.error(f"Error: {str(e)}")
         return "סליחה אך אינני יכול לענות על שאלה זו"
 
-
 def create_chatbot():
+    # Initialize session state if it doesn't exist
     if 'messages' not in st.session_state:
         st.session_state['messages'] = []
+        st.session_state['first_message'] = True  # Track whether it's the first message
 
     # Display previous chat messages
     for message in st.session_state.get('messages', []):
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    # Input for the user's message
-    prompt = st.chat_input("שאל אותי כל שאלה")
+    selected_question = None
+
+    # If it's the first message, show the optional questions as buttons
+    if st.session_state['first_message']:
+        optional_questions = [
+            "אתה מאמין באלוהים?",
+            "למה גרת בשדה בוקר?",
+            "למה עשית עמידות ראש?",
+            "למה לא ביטלת את הממשל הצבאי?",
+        ]
+
+        # Create four buttons in a row using columns
+        col1, col2, col3, col4 = st.columns(4)
+
+        # Display buttons in each column, and check if one is clicked
+        with col1:
+            if st.button(optional_questions[0]):
+                selected_question = optional_questions[0]
+        with col2:
+            if st.button(optional_questions[1]):
+                selected_question = optional_questions[1]
+        with col3:
+            if st.button(optional_questions[2]):
+                selected_question = optional_questions[2]
+        with col4:
+            if st.button(optional_questions[3]):
+                selected_question = optional_questions[3]
+
+        # After the first message is sent, set `first_message` to False
+        if selected_question:
+            st.session_state['first_message'] = False
+
+    # Input for the user's custom message or the selected question
+    prompt = st.text_input("שאל אותי כל שאלה", value=selected_question if selected_question else "")
 
     if prompt:
         # Display the user input
@@ -222,6 +265,10 @@ def create_chatbot():
                 response = ask_groq(prompt)
             st.markdown(response)
         st.session_state['messages'].append({"role": "assistant", "content": response})
+
+        # Once the first message has been sent, mark it as processed
+        st.session_state['first_message'] = False
+
 
 
 async def main():

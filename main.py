@@ -110,7 +110,7 @@ with col2:
 # Load the pre-trained sentence-transformers model for semantic search
 @st.cache_resource
 def load_model():
-    model = SentenceTransformer('paraphrase-MiniLM-L6-v2')  # Lightweight transformer model for semantic search
+    model = SentenceTransformer('intfloat/multilingual-e5-large')
     return model
 
 

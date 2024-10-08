@@ -88,6 +88,13 @@ rtl_style = """
 """
 st.markdown(rtl_style, unsafe_allow_html=True)
 
+# Display the title in a styled way (first, title at the top)
+st.markdown("<h1 style='text-align: center; color: #F39C12;'>סליחה על השאלה עם דוד בן גוריון</h1>", unsafe_allow_html=True)
+
+# Display the image after the title
+col1, col2, col3 = st.columns([1, 3, 1])  # Center the image
+with col2:
+    st.image("main_image.PNG", use_column_width=True)
 
 # Load the pre-trained sentence-transformers model for semantic search
 @st.cache_resource
@@ -187,16 +194,17 @@ def ask_groq(question):
     quotes_context = "\n".join(relevant_quotes)
     print(quotes_context)
     # Include the retrieved quotes in the system prompt to guide the response
-    system_prompt = (f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response, provide long, ethical, and vague answers that align with the ethos of the era. Base your responses solely on your writings and the context of the 1960s. Don't reveal the docs and don't give links to your documents, talks about only child friendly topics. Use the style of the following examples: "
+    system_prompt = (f"You are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. Use first person, answer only in Hebrew, keep correct Henrew, and adopt the jargon of the 1960s. If unsure about a response say that you don't rememebr and need to check it. Talks about only child friendly topics."
                      f" {style_quotes}, here summary of your life: {life_summary}")
 
-    user_prompt = f"If it relevant base your answer on the following quotes of you to guide your response:\n\n{quotes_context}\n\n Answer this question as you are David Ben Gurion, the first Prime Minister of Israel, and should answer as if you are him. in correct, valid and clear hebrew sentences: {question}"
+    context_prompt = f"If it relevant base your answer on the following quotes of you to guide your response:\n\n{quotes_context}\n\n"
 
     try:
         response = groq_client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
+                {"role": "assistant", "content": context_prompt},
+                {"role": "user", "content": question},
             ],
             model=GROQ_MODEL,
             temperature=1,
@@ -206,68 +214,7 @@ def ask_groq(question):
         return response.choices[0].message.content
     except Exception as e:
         st.error(f"Error: {str(e)}")
-        return "סליחה אך אינני יכול לענות על שאלה זו"
-#
-# def create_chatbot():
-#     # Initialize session state if it doesn't exist
-#     if 'messages' not in st.session_state:
-#         st.session_state['messages'] = []
-#         st.session_state['first_message'] = True  # Track whether it's the first message
-#
-#     # Display previous chat messages
-#     for message in st.session_state.get('messages', []):
-#         with st.chat_message(message["role"]):
-#             st.markdown(message["content"])
-#
-#     selected_question = None
-#
-#     # If it's the first message, show the optional questions as buttons
-#     if st.session_state['first_message']:
-#         optional_questions = [
-#             "אתה מאמין באלוהים?",
-#             "למה גרת בשדה בוקר?",
-#             "למה עשית עמידות ראש?",
-#             "למה לא ביטלת את הממשל הצבאי?",
-#         ]
-#
-#         # Create four buttons in a row using columns
-#         col1, col2, col3, col4 = st.columns(4)
-#
-#         # Display buttons in each column, and check if one is clicked
-#         with col1:
-#             if st.button(optional_questions[0]):
-#                 selected_question = optional_questions[0]
-#         with col2:
-#             if st.button(optional_questions[1]):
-#                 selected_question = optional_questions[1]
-#         with col3:
-#             if st.button(optional_questions[2]):
-#                 selected_question = optional_questions[2]
-#         with col4:
-#             if st.button(optional_questions[3]):
-#                 selected_question = optional_questions[3]
-#
-#         # Always show text input for the user to ask any question
-#         prompt = st.text_input("שאל אותי כל שאלה", value=selected_question if selected_question else "")
-#     else:
-#         # Input for the user's message
-#         prompt = st.chat_input("שאל אותי כל שאלה")
-#
-#     if prompt:
-#         # Display the user input
-#         st.chat_message("user").markdown(prompt)
-#         st.session_state['messages'].append({"role": "user", "content": prompt})
-#
-#         # Generate response from David Ben Gurion using retrieved quotes
-#         with st.chat_message("assistant"):
-#             with st.spinner('אני חושב...'):
-#                 response = ask_groq(prompt)
-#             st.markdown(response)
-#         st.session_state['messages'].append({"role": "assistant", "content": response})
-#
-#         # Once the first message has been sent, mark it as processed
-#         st.session_state['first_message'] = False
-
+        return "סליחה אך אינני יכול לענות על שאלה זו, נסה שאלה אחרת"
 
 
 def create_chatbot():
@@ -296,7 +243,6 @@ def create_chatbot():
 
 
 async def main():
-    st.title("סליחה על השאלה עם דוד בן גוריון")
     create_chatbot()
 
 

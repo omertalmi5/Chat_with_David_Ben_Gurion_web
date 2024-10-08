@@ -71,30 +71,41 @@ life_summary = """דוד גרין נולד בעיירה פלונסק שבפול�
 # Set page config at the very beginning
 st.set_page_config(layout="wide", page_title="Chat with David Ben Gurion", page_icon="🌟")
 
-# Add RTL support via CSS
-rtl_style = """
+# Add RTL support via CSS and set background and text colors for desert style
+desert_style = """
     <style>
     body {
         direction: rtl;
-        text-align: right;
+        color: #8B4513; /* Warm brown text color */
+    }
+    h1 {
+        text-align: center;
+        color: #ffffff; /* Warm desert orange-brown for the title */
+        font-family: 'Arial', sans-serif;
     }
     .stTextInput > div > div > input {
         direction: rtl;
+        background-color: #FBEEC1; /* Light sand-colored input field */
+        border: 2px solid #C19A6B; /* Warm brown border */
+        # color: #8B4513; /* Brown text inside input */
     }
     .stChatMessage .stMarkdown {
         text-align: right;
+        # color: #8B4513; /* Ensure chat text is warm brown */
     }
     </style>
 """
-st.markdown(rtl_style, unsafe_allow_html=True)
 
-# Display the title in a styled way (first, title at the top)
-st.markdown("<h1 style='text-align: center; color: #F39C12;'>סליחה על השאלה עם דוד בן גוריון</h1>", unsafe_allow_html=True)
+# Apply the desert style
+st.markdown(desert_style, unsafe_allow_html=True)
+
+# Display the title in the styled way (warm desert orange-brown color)
+st.markdown("<h1>סליחה על השאלה עם דוד בן גוריון</h1>", unsafe_allow_html=True)
 
 # Display the image after the title
 col1, col2, col3 = st.columns([1, 3, 1])  # Center the image
 with col2:
-    st.image("main_image.PNG", use_column_width=True)
+    st.image("main_image.PNG", width = 30, use_column_width=True)
 
 # Load the pre-trained sentence-transformers model for semantic search
 @st.cache_resource
@@ -188,7 +199,7 @@ def retrieve_relevant_quotes_semantically(query, top_k=3):
 @lru_cache(maxsize=100)
 def ask_groq(question):
     # Retrieve relevant quotes from the PDF using semantic search
-    relevant_quotes = retrieve_relevant_quotes_semantically(question, 2)
+    relevant_quotes = retrieve_relevant_quotes_semantically(question, 3)
 
     # Join relevant quotes into a single string for the system prompt
     quotes_context = "\n".join(relevant_quotes)

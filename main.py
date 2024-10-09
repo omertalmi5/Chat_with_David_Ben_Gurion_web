@@ -110,7 +110,7 @@ with col2:
 # Load the pre-trained sentence-transformers model for semantic search
 @st.cache_resource
 def load_model():
-    model = SentenceTransformer('intfloat/multilingual-e5-large')
+    model = SentenceTransformer('intfloat/multilingual-e5-large')  # Lightweight transformer model for semantic search
     return model
 
 
@@ -164,8 +164,12 @@ def load_quotes_from_pdf(pdf_path, chunk_size=200):
     return chunks
 
 # Load chunks from the attached PDF
-QUOTES = load_quotes_from_pdf(QUOTES_FILE_PATH)
+pdf_quotes = load_quotes_from_pdf(QUOTES_FILE_PATH)
 
+with open('wiki.txt', 'r', encoding='utf-8') as file:
+    wiki_quotes = file.read().splitlines()
+
+QUOTES = wiki_quotes + pdf_quotes
 # Precompute embeddings for all the chunks
 @st.cache_data
 def compute_quote_embeddings(quotes):
@@ -218,7 +222,7 @@ def ask_groq(question):
                 {"role": "user", "content": question},
             ],
             model=GROQ_MODEL,
-            temperature=1,
+            temperature=0.8,
             max_tokens=1024,
             stream=False,
         )
